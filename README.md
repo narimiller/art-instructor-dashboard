@@ -2,7 +2,7 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://art-instructor-dashboard.streamlit.app/)
 
 ## Overview
-This repository contains a demo version of an Instructor Dashboard, which is designed to provide insights and analytics for online art courses. The dashboard tracks metrics such as student participation, module completion rates, and overall engagement. The demo data is generated to simulate real usage and does not reflect actual student information. There are also no images to display in features built to filter and show student work.
+This repository contains a demo version of an Instructor Dashboard, which is designed to provide insights and analytics for online art courses. The dashboard tracks metrics such as student participation, module completion rates, and overall engagement. The demo data is generated to simulate real usage and does not reflect actual student information. There are also no images to display in this demo.
 
 The real dashboard is being used by the instructor-stakeholder to enhance the learning experience and improve course outcomes. Currently the dashboard uses data for a single course, but support will be added for additional courses in the future.
 
@@ -37,6 +37,7 @@ Filters: All assignments for metric cards. All assignments posted during a term 
 | **Avg Completion Rate** | Same as above, averaged across all students.        | ```AVG(100 * COUNT(modules_posted) / total_modules)``` | Understand the behavior of the average student.     |
 | **Avg Completion Rate (cohorts page)** | The percentage of modules a student has completed within the selected term, averaged across all active participants.        | ```AVG(100 * COUNT(modules_posted_during_term) / total_modules_during_term)``` | Understand completion  within a single term.     |
 <br>
+
 ## Future Work
 - Refactor code to accommodate additional courses.
 - Consider using an additional table (terms + all assignments for those terms) in order to provide every possible cohort-assignment combination. Currently, the code relies on there being at least one post in a cohort-assignment pair for it to be displayed in heatmaps and used in calculations.
