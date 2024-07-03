@@ -1,4 +1,5 @@
-# art-instructor-dashboard
+# Art Instructor Dashboard
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://art-instructor-dashboard.streamlit.app/)
 
 ## Overview
 This repository contains a demo version of an Instructor Dashboard, which is designed to provide insights and analytics for online art courses. The dashboard tracks metrics such as student participation, module completion rates, and overall engagement. The demo data is generated to simulate real usage and does not reflect actual student information. There are also no images to display in features built to filter and show student work.
@@ -6,7 +7,7 @@ This repository contains a demo version of an Instructor Dashboard, which is des
 The real dashboard is being used by the instructor-stakeholder to enhance the learning experience and improve course outcomes. Currently the dashboard uses data for a single course, but support will be added for additional courses in the future.
 
 ## Credit
-This project is being developed in collaboration with [@dorian-iten](https://github.com/dorian-iten). His insights and feedback have been crucial in shaping the functionality and of this dashboard.
+This project is being developed in collaboration with [@dorian-iten](https://github.com/dorian-iten). His insights and feedback have been crucial in shaping the functionality of this dashboard.
 
 ## Pages
 #### Students

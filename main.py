@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-import cohorts, courses, students, uploads
+import cohorts, courses, students
 
 st.set_page_config(
     page_title="Instructor Dashboard",
@@ -15,7 +15,7 @@ with st.sidebar:
         menu_title='Instructor Dash',
         menu_icon='activity',
         options=['Courses', 'Cohorts', 'Students'],
-         icons=['star', 'bullseye', 'person','image','play-circle'],
+         icons=['star', 'bullseye', 'person'],
         default_index=0,
         styles={
             "container": {"padding": "5!important"},
