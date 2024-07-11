@@ -24,34 +24,6 @@ def app():
     q = read_query_from_file(query_file_path, 'posts_all')
     posts = pd.read_sql_query(q, conn, params=(TERM_END_BUFFER, TERM_END_BUFFER))
 
-    # Cohort sizes over time
-    q_all = """
-    SELECT c.cohort_id, c.name as term_name, COUNT(DISTINCT u.username) as total_students
-    FROM cohorts c
-    LEFT JOIN uploads u
-    ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, '{TERM_END_BUFFER}')
-    WHERE u.username IS NOT NULL
-    GROUP BY c.cohort_id, c.name
-    ORDER BY c.cohort_id
-    """
-    q_all = q_all.format(TERM_END_BUFFER=TERM_END_BUFFER)
-    cohort_sizes_all = pd.read_sql_query(q_all, conn)
-
-    q_3_modules = """
-    SELECT cohort_id, term_name, COUNT(username) AS total_students
-    FROM (
-        SELECT c.cohort_id, c.name AS term_name, u.username, COUNT(DISTINCT u.module) AS modules_count
-        FROM uploads u
-        INNER JOIN cohorts c ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, '{TERM_END_BUFFER}')
-        GROUP BY c.cohort_id, c.name, u.username
-        HAVING modules_count >= 3
-    )
-    GROUP BY cohort_id, term_name
-    ORDER BY cohort_id
-    """
-    q_3_modules = q_3_modules.format(TERM_END_BUFFER=TERM_END_BUFFER)
-    cohort_sizes_3_modules = pd.read_sql_query(q_3_modules, conn)
-
     conn.close()
 
     #######################
@@ -209,8 +181,8 @@ def app():
 
     #######################
     # Main panel
-  
-    st.title("The Super Awesome Drawing Course")
+
+    st.title("The Shading Course")
     
     # Calculate avg completion
     student_modules = posts.groupby('username')['module'].nunique().reset_index()
@@ -239,6 +211,15 @@ def app():
 
     st.markdown('#### Participation per Cohort')
     
+    filter1 = posts['term_name'].notnull()
+    filter2 = (posts['term_name'].notnull()) & (posts['num_posts'] > 0)
+    active_students: pd.DataFrame = posts[filter1].groupby(['cohort_id', 'term_name'])['username'].nunique().reset_index()
+    active_students.rename(columns={'username':'total_students'}, inplace=True)
+
+    three_plus = posts[filter2].groupby(['cohort_id', 'term_name', 'username'])['module'].nunique().reset_index()
+    three_plus = three_plus[three_plus['module'] >= 3].groupby(['cohort_id', 'term_name'])['username'].nunique().reset_index()
+    three_plus.rename(columns={'username':'total_students'}, inplace=True)
+
     toggle = ui.tabs(
         options=["All", "3+ Modules", "Both"],
         default_value="All",
@@ -246,13 +227,13 @@ def app():
     )
 
     if toggle == "All":
-        selected_df = cohort_sizes_all
+        selected_df = active_students
         st.plotly_chart(make_participation_trend_chart(selected_df, 'Participation Trends (All)'), use_container_width=True, theme='streamlit')
     elif toggle == "3+ Modules":
-        selected_df = cohort_sizes_3_modules
+        selected_df = three_plus
         st.plotly_chart(make_participation_trend_chart(selected_df, 'Participation Trends (3+ Modules)'), use_container_width=True, theme='streamlit')
     elif toggle == "Both":
-        st.plotly_chart(make_combined_participation_trend_chart(cohort_sizes_all, cohort_sizes_3_modules), use_container_width=True, theme='streamlit')
+        st.plotly_chart(make_combined_participation_trend_chart(active_students, three_plus), use_container_width=True, theme='streamlit')
 
     row2 = st.columns(3, gap='medium')
     with row2[1]:

@@ -1,7 +1,8 @@
 -- START_QUERY: csize_over_time
 WITH expanded AS
     (
-    SELECT *
+    SELECT *, 
+        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -44,7 +45,8 @@ SELECT * FROM final;
 -- START_QUERY: student_posts
  WITH posts AS 
     (
-    SELECT cohort_id, c.name AS term_name, module, assignment_full,
+    SELECT cohort_id, c.name AS term_name, module, 
+        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full,
         username, datetime
     FROM uploads u
     INNER JOIN cohorts c
@@ -116,7 +118,7 @@ FROM final;
 WITH final AS 
     (
     SELECT c.cohort_id, c.name AS term_name, u.module, 
-        u.assignment_full AS assignment,
+        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment,
         u.username, u.datetime, COUNT(*) AS num_images
     FROM uploads u
     LEFT JOIN cohorts c
@@ -136,7 +138,8 @@ SELECT * FROM final;
 -- START_QUERY: alltime_totals
  WITH posts AS 
     (
-    SELECT c.cohort_id, c.name AS term_name, u.module, u.assignment_full,
+    SELECT c.cohort_id, c.name AS term_name, u.module, 
+        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment_full,
         u.username, u.datetime, COUNT(*) AS num_images
     FROM uploads u
     LEFT JOIN cohorts c
@@ -164,7 +167,8 @@ totals AS
 -- START_QUERY: rates_by_grouping
 WITH expanded AS
     (
-    SELECT *
+    SELECT *, 
+        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -225,7 +229,8 @@ SELECT *,
 -- START_QUERY: rates_with_nulls
 WITH expanded AS
 (
-    SELECT *
+    SELECT *, 
+        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment_full
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -233,7 +238,7 @@ WITH expanded AS
         (SELECT DISTINCT assignment
         FROM uploads 
         WHERE assignment GLOB 'A[0-9]*')
-    ORDER BY c.cohort_id, u.module, u.assignment_full, u.username, u.datetime
+    ORDER BY c.cohort_id, u.module, assignment_full, u.username, u.datetime
 ),
 
 posts AS 
@@ -315,7 +320,8 @@ ORDER BY cohort_id, module, assignment;
 -- START_QUERY: posts_all
 WITH posts AS 
     (
-    SELECT cohort_id, c.name AS term_name, module, assignment_full,
+    SELECT cohort_id, c.name AS term_name, module, 
+        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full,
         username, datetime
     FROM uploads u
     LEFT JOIN cohorts c
@@ -351,7 +357,7 @@ cohort_assignments AS
 
 user_cohorts AS
     (
-    SELECT DISTINCT username, recent_cohort_id, 
+    SELECT DISTINCT username, recent_cohort_id, term_name,
     CASE WHEN cohort_id IS NULL THEN "between terms" ELSE cohort_id END AS cohort_id
     FROM recent_term
     ORDER BY username
@@ -360,7 +366,7 @@ user_cohorts AS
 user_assignments AS
     (
     SELECT uc.username, uc.recent_cohort_id, 
-        uc.cohort_id, 
+        uc.cohort_id, uc.term_name, 
         ca.module, ca.assignment_full AS assignment
     FROM user_cohorts uc
     INNER JOIN cohort_assignments ca
@@ -370,7 +376,7 @@ user_assignments AS
 post_count AS
     (
     SELECT
-        CASE WHEN cohort_id IS NULL THEN "between terms" ELSE cohort_id END AS cohort_id,
+        CASE WHEN cohort_id IS NULL THEN 'between terms' ELSE cohort_id END AS cohort_id,
         recent_cohort_id, module, assignment_full AS assignment, username, COUNT(datetime) AS num_posts
     FROM recent_term
     GROUP BY cohort_id, recent_cohort_id, module, assignment, username
@@ -378,7 +384,7 @@ post_count AS
 
 final AS
     (
-    SELECT ua.cohort_id, 
+    SELECT ua.cohort_id, ua.term_name,
         ua.recent_cohort_id, ua.module, ua.assignment, ua.username, 
         COALESCE(p.num_posts, 0) AS num_posts
     FROM user_assignments ua
