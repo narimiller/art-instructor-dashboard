@@ -1,8 +1,7 @@
 -- START_QUERY: csize_over_time
 WITH expanded AS
     (
-    SELECT *, 
-        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full
+    SELECT *
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -45,9 +44,7 @@ SELECT * FROM final;
 -- START_QUERY: student_posts
  WITH posts AS 
     (
-    SELECT cohort_id, c.name AS term_name, module, 
-        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full,
-        username, datetime
+    SELECT cohort_id, c.name AS term_name, module, assignment_full, username, datetime
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -118,7 +115,7 @@ FROM final;
 WITH final AS 
     (
     SELECT c.cohort_id, c.name AS term_name, u.module, 
-        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment,
+        assignment_full AS assignment,
         u.username, u.datetime, COUNT(*) AS num_images
     FROM uploads u
     LEFT JOIN cohorts c
@@ -138,8 +135,7 @@ SELECT * FROM final;
 -- START_QUERY: alltime_totals
  WITH posts AS 
     (
-    SELECT c.cohort_id, c.name AS term_name, u.module, 
-        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment_full,
+    SELECT c.cohort_id, c.name AS term_name, u.module, assignment_full,
         u.username, u.datetime, COUNT(*) AS num_images
     FROM uploads u
     LEFT JOIN cohorts c
@@ -167,8 +163,7 @@ totals AS
 -- START_QUERY: rates_by_grouping
 WITH expanded AS
     (
-    SELECT *, 
-        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full
+    SELECT *
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -229,8 +224,7 @@ SELECT *,
 -- START_QUERY: rates_with_nulls
 WITH expanded AS
 (
-    SELECT *, 
-        SUBSTR(u.filename, 1, INSTR(u.filename, '-') - 1) AS assignment_full
+    SELECT *
     FROM uploads u
     INNER JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)
@@ -320,9 +314,7 @@ ORDER BY cohort_id, module, assignment;
 -- START_QUERY: posts_all
 WITH posts AS 
     (
-    SELECT cohort_id, c.name AS term_name, module, 
-        SUBSTR(filename, 1, INSTR(filename, '-') - 1) AS assignment_full,
-        username, datetime
+    SELECT cohort_id, c.name AS term_name, module, assignment_full, username, datetime
     FROM uploads u
     LEFT JOIN cohorts c
         ON u.datetime BETWEEN c.launch_start AND DATE(c.term_end, ?)

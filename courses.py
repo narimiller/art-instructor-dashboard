@@ -182,7 +182,7 @@ def app():
     #######################
     # Main panel
 
-    st.title("The Shading Course")
+    st.title("The Super Awesome Drawing Course")
     
     # Calculate avg completion
     student_modules = posts.groupby('username')['module'].nunique().reset_index()

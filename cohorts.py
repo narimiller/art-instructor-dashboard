@@ -80,7 +80,7 @@ def app():
         # Filter based on cohort_id
         filtered_df = df[df['cohort_id'] == cohort_id]
         if x_name == 'module':
-            filtered_df = filtered_df.groupby(['username', 'module']). sum().reset_index()
+            filtered_df = filtered_df.groupby(['username', 'module']).sum().reset_index()
         
         custom_colorscale = [
                 [0.0, backgroundColor],
